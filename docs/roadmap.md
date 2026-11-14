@@ -35,7 +35,7 @@ A step is done when its guide is written, every "Try it yourself" command runs, 
   - [x] `docs/00-overview.md`, `docs/01-setup.md`, `docs/glossary.md`, README with disclaimer
   - [x] Docker Desktop and Ollama installed, models pulled (embedding size verified: 1024)
   - [x] committed locally
-- [ ] **step-02-data** - fetch trials from the ClinicalTrials.gov API, cache them (guide `02`)
+- [x] **step-02-data** - fetch trials from the ClinicalTrials.gov API, cache them (guide `02`)
 - [ ] **step-03-providers** - `LLMProvider` / `EmbeddingProvider`, Ollama adapter, Bedrock adapter (guide `07`)
 - [ ] **step-04-database** - Postgres + pgvector schema, indexes, `app/db.py` (guide `04`)
 - [ ] **step-05-ingestion** - chunking, embedding, idempotent upsert, `ingestion/run.py` (guide `03`)
@@ -200,4 +200,8 @@ one that says what changed.
 | 2026-11-14 | MIT license | Short, familiar, fine for a portfolio/learning project |
 | 2026-11-14 | One plain-English guide per step, shipped in the same commit as the code | The repo exists to learn from |
 | 2026-11-14 | Install Docker Desktop and Ollama from the official downloads, not Homebrew | Homebrew wasn't installed and its installer needs sudo; the official installers need no extra tool |
+| 2026-11-14 | Fetch 9 capped topics (4 core + 5 distractors), interventional studies only, phase 2/3 for the broad topics: 3,408 unique trials | The API has 15k+ obesity trials alone; a capped, focused slice downloads in seconds and still supports the GLP-1 demo question |
+| 2026-11-14 | Request only the fields we need (`fields=`) | Full records are mostly hospital location lists; the slice is 21 MB instead of hundreds |
+| 2026-11-14 | Limited (`--limit`) downloads go to `data/raw-sample/` | A sample must never be mistaken for the full dataset by later steps |
+| 2026-11-14 | Only about half of trials have a detailed description | Chunking (step 05) must handle missing sections |
 | 2026-11-14 | Keep progress as a checklist in this file, not a Ralph-style autonomous loop | We want to understand each step; a loop runs unattended and skips review. Revisit for eval-driven tuning in Phase 2 |
