@@ -1,5 +1,5 @@
 # Short names for the commands you'll run most. `make help` lists them.
-.PHONY: help setup lint format test fetch fetch-sample check-models
+.PHONY: help setup lint format test fetch fetch-sample check-models db-up db-down db-init db-status db-psql db-reset
 
 help: ## Show this list
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -27,3 +27,23 @@ fetch-sample: ## Download a tiny sample (20 trials per topic) to try things out
 
 check-models: ## Check that the configured AI models respond
 	uv run python -m app.providers
+
+db-up: ## Start Postgres (with pgvector) in Docker and wait until it is ready
+	docker compose up -d --wait postgres
+
+db-down: ## Stop Postgres (your data is kept)
+	docker compose stop postgres
+
+db-init: ## Create the tables and indexes (safe to repeat)
+	uv run python -m app.db init
+
+db-status: ## Show database versions, row counts and indexes
+	uv run python -m app.db status
+
+db-psql: ## Open a SQL prompt inside the database
+	docker compose exec postgres psql -U rag trials
+
+db-reset: ## DELETE ALL DATABASE DATA and start from an empty database
+	docker compose down -v
+	$(MAKE) db-up
+	$(MAKE) db-init

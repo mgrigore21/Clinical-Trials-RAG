@@ -49,6 +49,7 @@ classes in `ollama.py` and `bedrock.py` never need to declare it; they just have
 class LLMProvider(Protocol):
     def generate(self, messages: list[Message], temperature: float = 0.0) -> Generation: ...
 
+
 class EmbeddingProvider(Protocol):
     def embed(self, texts: list[str]) -> list[list[float]]: ...
 ```
