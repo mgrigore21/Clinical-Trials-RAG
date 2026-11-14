@@ -197,7 +197,7 @@ Expected: `3408 unique trials` (about).
 make test
 ```
 
-Expected: `11 passed`.
+Expected: all tests pass (`11 passed` at the end of this step; the number grows with each step).
 
 ## Common problems
 
