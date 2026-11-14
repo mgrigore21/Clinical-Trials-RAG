@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Project-specific ---
+# Downloaded ClinicalTrials.gov data (large, re-downloadable)
+/data/
+# Generated evaluation reports
+/evals/reports/
