@@ -130,6 +130,19 @@ curl http://localhost:11434/api/tags
 
 Expected: a line of JSON that mentions `llama3.1:8b` and `mxbai-embed-large`.
 
+**GitHub CLI (`gh`)**: optional but handy. It lets you push branches and open pull requests from the
+terminal. The simplest install is Homebrew (`brew install gh`). Without Homebrew, download the
+**macOS `.pkg`** from <https://github.com/cli/cli/releases/latest> (pick the file ending in `arm64` on
+Apple silicon) and open it. Then log in once (answer: GitHub.com, HTTPS, Yes, "Login with a web browser"):
+
+```bash
+gh auth login
+gh auth setup-git
+gh auth status
+```
+
+Expected: `gh auth status` ends with `Logged in to github.com account <your name>`.
+
 ### 2. Set up the Python project
 
 ```bash
@@ -215,6 +228,12 @@ bad setting, which is what we want.
   Run `make lint` again; it should now pass. When committing, `git add` the changed files first.
 - **`make lint` says `no files to check` for ruff / YAML / TOML**: pre-commit only looks at files
   git already knows about. Files that are brand new and not yet staged (`git add`) are skipped.
+- **`gh: accepts 0 arg(s), received 4`** (or similar): you pasted a command together with its `#`
+  comment. In macOS's default shell (zsh), text after `#` is **not** ignored when you type a command
+  interactively, so `gh` receives the comment's words as arguments. Run the command without the comment.
+- **The `gh` download only shows folders and files, nothing installs**: you got the `.zip`, not the
+  `.pkg`. The program is the file `bin/gh` inside. Either download the `.pkg`, or copy that file into a
+  folder on your PATH, e.g. `mkdir -p ~/.local/bin && cp bin/gh ~/.local/bin/`.
 - **`uv: command not found`**: install uv (link above), then open a new terminal.
 - **`.env` changes seem ignored**: a variable set in your shell wins over the `.env` file. Check
   with `env | grep -E 'PROVIDER|TOP_K'`.
