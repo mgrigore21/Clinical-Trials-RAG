@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     embedding_dim: int = 1024
 
     top_k: int = 8
+    # Where downloaded trial data is kept (git-ignored). See docs/02-getting-the-data.md.
+    data_dir: str = "data"
     request_timeout_s: float = 120.0
 
     aws_region: str = "eu-central-1"
