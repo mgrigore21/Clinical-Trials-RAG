@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # Must match the vector column size in the database. 1024 works for both the local
     # model and Bedrock Titan v2 — see docs/03-chunking-and-embeddings.md.
     embedding_dim: int = 1024
+    # How much text Ollama lets the chat model read at once (the prompt plus the answer, in
+    # tokens). See docs/07-providers.md for why we set it instead of trusting the default.
+    ollama_num_ctx: int = 8192
 
     top_k: int = 8
     # Where downloaded trial data is kept (git-ignored). See docs/02-getting-the-data.md.
