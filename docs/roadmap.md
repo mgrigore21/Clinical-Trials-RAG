@@ -36,7 +36,7 @@ A step is done when its guide is written, every "Try it yourself" command runs, 
   - [x] Docker Desktop and Ollama installed, models pulled (embedding size verified: 1024)
   - [x] committed locally
 - [x] **step-02-data** - fetch trials from the ClinicalTrials.gov API, cache them (guide `02`)
-- [ ] **step-03-providers** - `LLMProvider` / `EmbeddingProvider`, Ollama adapter, Bedrock adapter (guide `07`)
+- [x] **step-03-providers** - `LLMProvider` / `EmbeddingProvider`, Ollama adapter, Bedrock adapter (guide `07`)
 - [ ] **step-04-database** - Postgres + pgvector schema, indexes, `app/db.py` (guide `04`)
 - [ ] **step-05-ingestion** - chunking, embedding, idempotent upsert, `ingestion/run.py` (guide `03`)
 - [ ] **step-06-retrieval** - vector + full-text search fused with RRF (guide `05`)
@@ -204,4 +204,7 @@ one that says what changed.
 | 2026-11-14 | Request only the fields we need (`fields=`) | Full records are mostly hospital location lists; the slice is 21 MB instead of hundreds |
 | 2026-11-14 | Limited (`--limit`) downloads go to `data/raw-sample/` | A sample must never be mistaken for the full dataset by later steps |
 | 2026-11-14 | Only about half of trials have a detailed description | Chunking (step 05) must handle missing sections |
+| 2026-11-14 | Embedder sends `truncate: false`; chunks must stay under about 1,500 characters | `mxbai-embed-large` reads at most 512 tokens (measured about 0.23 tokens per character, 0.31 worst case) and Ollama otherwise cuts longer text silently. Step 05 chunking must respect this |
+| 2026-11-14 | Set the Ollama context window explicitly (`OLLAMA_NUM_CTX=8192`) | Ollama's default window silently truncates long prompts, which would make answers use partial context |
+| 2026-11-14 | `LLM_MODEL` / `EMBEDDING_MODEL` hold Ollama names locally and Bedrock model IDs on AWS | One setting name, a value per environment; no extra provider-specific settings to keep in sync |
 | 2026-11-14 | Keep progress as a checklist in this file, not a Ralph-style autonomous loop | We want to understand each step; a loop runs unattended and skips review. Revisit for eval-driven tuning in Phase 2 |

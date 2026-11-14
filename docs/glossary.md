@@ -6,8 +6,9 @@ it first appears. When a new guide introduces a term, add it here in the same co
 **`.env` file**: a text file of environment variables for local development. Never committed to git.
 ([01](01-setup.md))
 
-**Amazon Bedrock**: Amazon's service for using AI models over the internet. It is the AWS
-counterpart of Ollama in this project. ([00](00-overview.md))
+**Adapter**: a small wrapper that hides one service's details behind a common, simple shape. Our Ollama and Bedrock classes are adapters, so the rest of the app doesn't know which one it uses. ([07](07-providers.md))
+
+**Amazon Bedrock**: Amazon's service for running AI models on AWS. The AWS counterpart of Ollama in this project; reached with the `boto3` library. ([07](07-providers.md))
 
 **API**: a way for programs (not people) to ask a service for data. ClinicalTrials.gov has one; we use it to download trials. ([02](02-getting-the-data.md))
 
@@ -24,6 +25,10 @@ from around the world. Our data source. ([00](00-overview.md))
 
 **Container**: a lightweight, isolated box that runs one program with everything it needs. Docker
 creates and runs them. ([01](01-setup.md))
+
+**Context window**: how much text a model can read at once (the prompt plus its answer), counted in tokens. Text beyond it is cut off. ([07](07-providers.md))
+
+**Cosine similarity**: a number that says how close two embeddings are in meaning: near 1 for similar meaning, lower for unrelated. ([07](07-providers.md))
 
 **Distractor**: data that is deliberately unrelated to the main theme (for us: asthma, depression, ...), so retrieval must pick the right trials instead of returning whatever exists. ([02](02-getting-the-data.md))
 
@@ -48,6 +53,8 @@ Used so the same code can behave differently locally and on AWS. ([01](01-setup.
 **Hallucination**: when an AI states something that sounds right but is made up. RAG with citations
 makes it easier to spot. ([00](00-overview.md))
 
+**Interface (Protocol)**: a written-down list of the methods something must have, so different classes can be used interchangeably. `LLMProvider` and `EmbeddingProvider` are ours. ([07](07-providers.md))
+
 **Interventional study**: a trial that tests a treatment, as opposed to one that only observes people. ([02](02-getting-the-data.md))
 
 **JSON**: plain text organised as nested lists and labelled values. The format most APIs use. ([02](02-getting-the-data.md))
@@ -67,7 +74,7 @@ makes it easier to spot. ([00](00-overview.md))
 **NCT ID**: the unique identifier of a trial on ClinicalTrials.gov, like `NCT01234567`. We use it as
 the citation. ([00](00-overview.md))
 
-**Ollama**: a program that runs AI models on your own computer. ([01](01-setup.md))
+**Ollama**: a program that runs AI models on your own computer and answers requests at `http://localhost:11434`. ([01](01-setup.md), [07](07-providers.md))
 
 **Pagination**: receiving a long list one page at a time. Each response includes a "next page token", a bookmark we send back to continue. ([02](02-getting-the-data.md))
 
@@ -90,6 +97,12 @@ using only those. ([00](00-overview.md))
 **Retry with backoff**: trying a failed request again after waiting, with longer waits each time (2s, 4s, 8s), to give a busy server room to recover. ([02](02-getting-the-data.md))
 
 **ruff**: a fast Python linter and formatter. ([01](01-setup.md))
+
+**Temperature**: how random a model's writing is. 0 means "always the most likely next word", so answers are repeatable; higher means more varied. ([07](07-providers.md))
+
+**Token**: a piece of a word, roughly 3 to 4 characters of English. Models read, write, are limited and are billed in tokens. ([07](07-providers.md))
+
+**Truncate**: to cut text off at a limit. Ollama does this quietly to over-long embedding input unless told not to, which is why we turn it off. ([07](07-providers.md))
 
 **uv**: a fast tool that installs Python and our libraries and keeps them in a virtual environment.
 ([01](01-setup.md))

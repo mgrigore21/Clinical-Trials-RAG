@@ -38,7 +38,7 @@ You also need Docker Desktop and Ollama; [docs/01-setup.md](docs/01-setup.md) wa
 | 04 The database | planned |
 | 05 Retrieval | planned |
 | 06 Generation and citations | planned |
-| 07 Providers | planned |
+| [07 Providers](docs/07-providers.md) | done |
 | 08 Running locally | planned |
 | 09 Evaluation | planned |
 

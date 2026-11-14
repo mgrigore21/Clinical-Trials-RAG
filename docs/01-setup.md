@@ -170,7 +170,8 @@ Expected: a list with `help`, `setup`, `lint`, `format` and `test`.
 make test
 ```
 
-Expected:
+Expected: a row of dots, then a line like `3 passed in 0.03s`. The number of tests grows with every
+step, so yours will be higher in later steps. What matters is that it says `passed` and nothing failed:
 
 ```
 uv run pytest
