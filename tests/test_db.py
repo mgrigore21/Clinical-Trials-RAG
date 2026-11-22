@@ -2,7 +2,7 @@
 
 The first test needs no database. The rest are marked `integration`: they need Postgres
 (`make db-up`) and are skipped, with a message, when it isn't running. They use their own database
-(`trials_test`), so they can never touch the data you ingested into `trials`.
+(`trials_test`, set up in conftest.py), so they never touch the data you ingested into `trials`.
 """
 
 import re
@@ -10,12 +10,9 @@ import re
 import psycopg
 import pytest
 from pgvector import Vector
-from psycopg.conninfo import make_conninfo
 
 from app import db
 from app.config import Settings
-
-TEST_DB = "trials_test"
 
 
 def vec(position: int) -> Vector:
@@ -45,31 +42,6 @@ def test_schema_vector_size_matches_the_embedding_dim_setting():
     # drift apart, inserts fail late and confusingly. This makes it fail early and clearly.
     declared = re.search(r"vector\((\d+)\)", db.SCHEMA_PATH.read_text()).group(1)
     assert int(declared) == Settings(_env_file=None).embedding_dim
-
-
-@pytest.fixture(scope="module")
-def test_db_url():
-    base_url = Settings(_env_file=None).database_url
-    try:
-        admin = psycopg.connect(make_conninfo(base_url, dbname="postgres"), autocommit=True)
-    except psycopg.OperationalError:
-        pytest.skip("Postgres is not running (start it with `make db-up`)")
-    with admin:
-        exists = admin.execute("SELECT 1 FROM pg_database WHERE datname = %s", (TEST_DB,))
-        if not exists.fetchone():
-            admin.execute(f'CREATE DATABASE "{TEST_DB}"')
-    url = make_conninfo(base_url, dbname=TEST_DB)
-    db.init_schema(url)
-    return url
-
-
-@pytest.fixture
-def conn(test_db_url):
-    connection = db.connect(test_db_url)
-    connection.autocommit = True
-    connection.execute("TRUNCATE trials CASCADE")  # every test starts from empty tables
-    yield connection
-    connection.close()
 
 
 @pytest.mark.integration

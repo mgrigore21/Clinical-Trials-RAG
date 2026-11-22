@@ -38,7 +38,7 @@ A step is done when its guide is written, every "Try it yourself" command runs, 
 - [x] **step-02-data** - fetch trials from the ClinicalTrials.gov API, cache them (guide `02`)
 - [x] **step-03-providers** - `LLMProvider` / `EmbeddingProvider`, Ollama adapter, Bedrock adapter (guide `07`)
 - [x] **step-04-database** - Postgres + pgvector in docker compose, schema, indexes, `app/db.py` (guide `04`)
-- [ ] **step-05-ingestion** - chunking, embedding, idempotent upsert, `ingestion/run.py` (guide `03`)
+- [x] **step-05-ingestion** - chunking, embedding, idempotent upsert, `ingestion/run.py` (guide `03`)
 - [ ] **step-06-retrieval** - vector + full-text search fused with RRF (guide `05`)
 - [ ] **step-07-generation** - grounded prompt, citations, invalid-citation check (guide `06`)
 - [ ] **step-08-api-docker** - `/ask`, `/health`, Dockerfile, extend docker compose with app + ingest (guide `08`)
@@ -212,4 +212,11 @@ one that says what changed.
 | 2026-11-14 | HNSW index with cosine distance; keyword index uses the `english` configuration (stemming); `tsv` is a generated column | Cosine suits text embeddings; stemming makes "obese" match "obesity" while drug names and NCT IDs stay intact; Postgres keeps `tsv` in sync |
 | 2026-11-14 | Database tests use a separate `trials_test` database and skip when Postgres is down | They can never wipe ingested data, and the suite still passes without Docker |
 | 2026-11-14 | Keyword search can only find an NCT ID that appears in the chunk text, so every chunk must start with `NCT ID \| title \| phase` (step 05) | Shown in the step 04 demo: the ID lives in `trials`, not in the chunk text |
+| 2026-11-22 | Four sections per trial (summary, description, eligibility, outcomes); eligibility split into inclusion/exclusion and outcomes into primary/secondary, each with a label repeated on every chunk | A bullet list without its heading is ambiguous ("pregnancy" means opposite things in the two lists), and the label is embedded too |
+| 2026-11-22 | Every chunk starts with `NCT ID \| title \| phase`; max 1,400 characters per chunk, header included | Identity in the embedding and in keyword search; real data measured up to 425 of 512 tokens at that size |
+| 2026-11-22 | No overlap between chunks | The labelled header already carries context; overlap adds size and count. First thing to try if evaluation shows boundary problems |
+| 2026-11-22 | A trial's fingerprint covers the record, `CHUNKING_VERSION` and the embedding model name | Changing the chunker or the model must re-process everything, or the database silently keeps chunks from the old rules |
+| 2026-11-22 | Trial row and its chunks are written in one transaction, 10 trials per commit; the slow embedding step runs outside it | A crash can never leave a trial that looks finished with chunks missing, and a re-run resumes where it stopped |
+| 2026-11-22 | Embed in batches of 32; throughput is about 15 chunks/s whatever the batch size (8 to 128 tested), so the full 24,484 chunks take about 27 minutes | The model is the bottleneck, not request overhead |
+| 2026-11-22 | Ingestion adds and updates but never deletes | Keeps the code small; `make db-reset` then `make ingest` rebuilds cleanly |
 | 2026-11-14 | Keep progress as a checklist in this file, not a Ralph-style autonomous loop | We want to understand each step; a loop runs unattended and skips review. Revisit for eval-driven tuning in Phase 2 |

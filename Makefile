@@ -1,5 +1,5 @@
 # Short names for the commands you'll run most. `make help` lists them.
-.PHONY: help setup lint format test fetch fetch-sample check-models db-up db-down db-init db-status db-psql db-reset
+.PHONY: help setup lint format test fetch fetch-sample check-models db-up db-down db-init db-status db-psql db-reset ingest ingest-sample
 
 help: ## Show this list
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -47,3 +47,9 @@ db-reset: ## DELETE ALL DATABASE DATA and start from an empty database
 	docker compose down -v
 	$(MAKE) db-up
 	$(MAKE) db-init
+
+ingest: ## Chunk, embed and store all downloaded trials (several minutes the first time)
+	uv run python -m ingestion.run
+
+ingest-sample: ## Same, but only for the small sample download (about a minute)
+	uv run python -m ingestion.run --sample
