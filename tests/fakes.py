@@ -17,6 +17,8 @@ def make_study(
     ),
     primary: tuple[str, ...] = ("Change in body weight",),
     secondary: tuple[str, ...] = ("Change in waist size",),
+    interventions: tuple[str, ...] = ("Semaglutide", "Placebo"),
+    status: str = "COMPLETED",
 ) -> dict:
     """A small trial record shaped like the ones ClinicalTrials.gov returns (see fetch.py)."""
     description_module = {}
@@ -31,16 +33,13 @@ def make_study(
             "briefTitle": title,
             "officialTitle": title + "!",
         },
-        "statusModule": {"overallStatus": "COMPLETED", "startDateStruct": {"date": "2022-08"}},
+        "statusModule": {"overallStatus": status, "startDateStruct": {"date": "2022-08"}},
         "sponsorCollaboratorsModule": {"leadSponsor": {"name": "Acme Pharma"}},
         "descriptionModule": description_module,
         "conditionsModule": {"conditions": ["Obesity"]},
         "designModule": {"studyType": "INTERVENTIONAL", "phases": list(phases)},
         "armsInterventionsModule": {
-            "interventions": [
-                {"type": "DRUG", "name": "Semaglutide"},
-                {"type": "DRUG", "name": "Placebo"},
-            ]
+            "interventions": [{"type": "DRUG", "name": name} for name in interventions]
         },
         "outcomesModule": {
             "primaryOutcomes": [{"measure": m} for m in primary],

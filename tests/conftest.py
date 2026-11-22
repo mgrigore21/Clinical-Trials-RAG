@@ -37,3 +37,15 @@ def conn(test_db_url):
     connection.execute("TRUNCATE trials CASCADE")  # every test starts from empty tables
     yield connection
     connection.close()
+
+
+@pytest.fixture
+def ingest_conn(test_db_url, conn):  # `conn` first: it empties the tables
+    """A normal (non-autocommit) connection, like the real ingestion uses.
+
+    Changes made through it only exist once committed, so looking at them through the separate
+    autocommit `conn` proves they were really saved.
+    """
+    connection = db.connect(test_db_url)
+    yield connection
+    connection.close()

@@ -3,15 +3,14 @@
 Skipped when Postgres isn't running. The fake embedder means no Ollama and no waiting, while
 everything on the database side (transactions, replacing chunks, skipping) is the real thing.
 
-Two connections are used on purpose. `ingest_conn` is a normal connection, like the real
-ingestion's, whose changes only exist once committed. `conn` (autocommit, from conftest.py) is a
-second connection used to look at the result: it only sees what was really committed.
+Two connections are used on purpose. `ingest_conn` (conftest.py) is a normal connection, like the
+real ingestion's, whose changes only exist once committed. `conn` (autocommit, also from
+conftest.py) is a second connection used to look at the result: it only sees what was committed.
 """
 
 import psycopg
 import pytest
 
-from app import db
 from app.providers.base import ProviderError
 from ingestion.chunk import chunk_trial
 from ingestion.run import content_hash, ingest
@@ -20,13 +19,6 @@ from tests.fakes import FakeEmbedder, make_study
 MODEL = "fake-model"
 
 pytestmark = pytest.mark.integration
-
-
-@pytest.fixture
-def ingest_conn(test_db_url, conn):  # `conn` first: it empties the tables
-    connection = db.connect(test_db_url)
-    yield connection
-    connection.close()
 
 
 def trials_of(*studies):

@@ -39,7 +39,7 @@ A step is done when its guide is written, every "Try it yourself" command runs, 
 - [x] **step-03-providers** - `LLMProvider` / `EmbeddingProvider`, Ollama adapter, Bedrock adapter (guide `07`)
 - [x] **step-04-database** - Postgres + pgvector in docker compose, schema, indexes, `app/db.py` (guide `04`)
 - [x] **step-05-ingestion** - chunking, embedding, idempotent upsert, `ingestion/run.py` (guide `03`)
-- [ ] **step-06-retrieval** - vector + full-text search fused with RRF (guide `05`)
+- [x] **step-06-retrieval** - vector + full-text search fused with RRF (guide `05`)
 - [ ] **step-07-generation** - grounded prompt, citations, invalid-citation check (guide `06`)
 - [ ] **step-08-api-docker** - `/ask`, `/health`, Dockerfile, extend docker compose with app + ingest (guide `08`)
 
@@ -219,4 +219,9 @@ one that says what changed.
 | 2026-11-22 | Trial row and its chunks are written in one transaction, 10 trials per commit; the slow embedding step runs outside it | A crash can never leave a trial that looks finished with chunks missing, and a re-run resumes where it stopped |
 | 2026-11-22 | Embed in batches of 32; throughput is about 15 chunks/s whatever the batch size (8 to 128 tested), so the full 24,484 chunks take about 27 minutes | The model is the bottleneck, not request overhead |
 | 2026-11-22 | Ingestion adds and updates but never deletes | Keeps the code small; `make db-reset` then `make ingest` rebuilds cleanly |
+| 2026-11-22 | Hybrid retrieval: 50 candidates from each search, merged with RRF (k=60), grouped by trial (a trial's score is its best chunk's), top 3 chunks kept per trial | Distances and text scores can't be added, ranks can; the question is about trials, and the chunks are evidence |
+| 2026-11-22 | Keyword search uses only words found in at most 15% of chunks, and ranks chunks by number of distinct matching words before Postgres's rank | Measured: requiring all words matched 1 chunk, allowing any matched 76% of all chunks, and Postgres's rank rewards repeating a common word ("phase") over a rare one |
+| 2026-11-22 | The vector query orders by distance alone, and sets `hnsw.ef_search` and `hnsw.iterative_scan` | A `, id` tie-breaker made Postgres ignore the index and sort every chunk; default settings returned 40 rows for `LIMIT 100`. Each now has a test that fails without the fix |
+| 2026-11-22 | `retrieve()` takes exact `phases` / `statuses` filters but does NOT extract them from the question | Plain RAG deliberately treats "phase 3" as ordinary words: the evaluation phase measures that weakness and the agent extension fixes it, using these same filters as its tool parameters |
+| 2026-11-22 | A question that names an existing NCT ID puts that trial first (score bonus) | The exact match otherwise only tied with the best meaningless vector hit, and won by storage order |
 | 2026-11-14 | Keep progress as a checklist in this file, not a Ralph-style autonomous loop | We want to understand each step; a loop runs unattended and skips review. Revisit for eval-driven tuning in Phase 2 |
