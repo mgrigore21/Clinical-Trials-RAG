@@ -1,0 +1,25 @@
+# Local services. For now only the database; the app and the ingestion job join in step 08.
+# See docs/04-the-database.md.
+services:
+  postgres:
+    # Postgres 16 with the pgvector extension already installed.
+    image: pgvector/pgvector:pg16
+    environment:
+      # Local development only. These match DATABASE_URL in .env.example.
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: rag
+      POSTGRES_DB: trials
+    ports:
+      - "5432:5432"
+    volumes:
+      # A named volume keeps the data when the container is stopped or recreated.
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # `docker compose up --wait` blocks until this passes, so nothing connects too early.
+      test: ["CMD-SHELL", "pg_isready -U rag -d trials"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
