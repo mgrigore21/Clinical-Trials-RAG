@@ -34,7 +34,7 @@ You also need Docker Desktop and Ollama; [docs/01-setup.md](docs/01-setup.md) wa
 | [00 Overview](docs/00-overview.md) | done |
 | [01 Setup](docs/01-setup.md) | done |
 | [02 Getting the data](docs/02-getting-the-data.md) | done |
-| 03 Chunking and embeddings | planned |
+| [03 Chunking and embeddings](docs/03-chunking-and-embeddings.md) | done |
 | [04 The database](docs/04-the-database.md) | done |
 | 05 Retrieval | planned |
 | 06 Generation and citations | planned |

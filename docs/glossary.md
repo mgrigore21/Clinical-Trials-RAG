@@ -17,11 +17,14 @@ so each step can be reviewed on its own. ([01](01-setup.md))
 
 **Cache**: a saved copy we reuse instead of fetching the same thing again. Our downloaded trials in `data/raw/` are one. ([02](02-getting-the-data.md))
 
-**Chunk**: a small piece of a document, such as a trial's eligibility section. We search chunks
-instead of whole documents because they are easier to match to a question. ([00](00-overview.md))
+**Chunk**: a small, labelled piece of a document, such as a trial's exclusion criteria. We embed and search chunks instead of whole trials because they are about one thing and they fit the embedding model's limit. ([00](00-overview.md), [03](03-chunking-and-embeddings.md))
+
+**Chunk header**: the first line of every chunk (`NCT ID | title | phase`). It puts the trial's identity into the embedding and makes the trial findable by its ID. ([03](03-chunking-and-embeddings.md))
 
 **ClinicalTrials.gov**: a public US government website and database listing clinical studies
 from around the world. Our data source. ([00](00-overview.md))
+
+**Commit**: saving the changes of a transaction for good. ([03](03-chunking-and-embeddings.md))
 
 **Container**: a lightweight, isolated box that runs one program with everything it needs. Docker
 creates and runs them. ([01](01-setup.md))
@@ -46,6 +49,8 @@ similar numbers, so the computer can search by meaning. Ours have 1024 numbers e
 **Environment variable**: a named value in a program's surroundings (for example `PROVIDER=ollama`).
 Used so the same code can behave differently locally and on AWS. ([01](01-setup.md))
 
+**Fingerprint (hash)**: a short code computed from some content that changes whenever the content changes. We store one per trial to know whether it is already ingested. ([03](03-chunking-and-embeddings.md))
+
 **Foreign key**: a column that must match an existing row in another table, so a chunk can't point at a trial that doesn't exist. ([04](04-the-database.md))
 
 **Formatter**: a tool that rewrites code into one consistent style (ruff does this). ([01](01-setup.md))
@@ -64,7 +69,11 @@ makes it easier to spot. ([00](00-overview.md))
 
 **HNSW**: an index for vectors that links nearby vectors into a web, so a search hops towards the closest ones instead of checking all. Fast, but approximate. ([04](04-the-database.md))
 
+**Idempotent**: giving the same result however many times you run it. Running ingestion twice is the same as running it once. ([03](03-chunking-and-embeddings.md))
+
 **Index**: a side structure that lets the database find rows without reading every one, like a book's index. ([04](04-the-database.md))
+
+**Ingestion**: loading data into the system: here, chunking the trials, embedding the chunks and storing them in the database. ([03](03-chunking-and-embeddings.md))
 
 **Integration test**: a test where several real parts work together (our code and a real Postgres). Skipped here when Postgres isn't running. ([04](04-the-database.md))
 
@@ -114,7 +123,7 @@ using only those. ([00](00-overview.md))
 
 **Retry with backoff**: trying a failed request again after waiting, with longer waits each time (2s, 4s, 8s), to give a busy server room to recover. ([02](02-getting-the-data.md))
 
-**Rollback**: undoing everything done since the last save point, so a try-out leaves no trace. ([04](04-the-database.md))
+**Rollback**: undoing everything done in the current transaction, so a failure or a try-out leaves no trace. ([03](03-chunking-and-embeddings.md), [04](04-the-database.md))
 
 **ruff**: a fast Python linter and formatter. ([01](01-setup.md))
 
@@ -127,6 +136,8 @@ using only those. ([00](00-overview.md))
 **Temperature**: how random a model's writing is. 0 means "always the most likely next word", so answers are repeatable; higher means more varied. ([07](07-providers.md))
 
 **Token**: a piece of a word, roughly 3 to 4 characters of English. Models read, write, are limited and are billed in tokens. ([07](07-providers.md))
+
+**Transaction**: a group of database changes that are saved together (commit) or not at all (rollback). It keeps a trial and its chunks from ever being half-written. ([03](03-chunking-and-embeddings.md))
 
 **Truncate**: to cut text off at a limit. Ollama does this quietly to over-long embedding input unless told not to, which is why we turn it off. ([07](07-providers.md))
 
