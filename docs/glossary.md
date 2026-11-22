@@ -12,6 +12,8 @@ it first appears. When a new guide introduces a term, add it here in the same co
 
 **API**: a way for programs (not people) to ask a service for data. ClinicalTrials.gov has one; we use it to download trials. ([02](02-getting-the-data.md))
 
+**Approximate search**: finding *nearly* the closest vectors much faster than checking all of them. The HNSW index does this, so results can differ slightly from an exact search. ([05](05-retrieval.md))
+
 **Branch**: a separate line of work in git. We use one small branch per step (`step-NN-<topic>`)
 so each step can be reviewed on its own. ([01](01-setup.md))
 
@@ -69,6 +71,8 @@ makes it easier to spot. ([00](00-overview.md))
 
 **HNSW**: an index for vectors that links nearby vectors into a web, so a search hops towards the closest ones instead of checking all. Fast, but approximate. ([04](04-the-database.md))
 
+**Hybrid search**: running a search by meaning and a search by keyword and combining their results, because each is good where the other is weak. ([05](05-retrieval.md))
+
 **Idempotent**: giving the same result however many times you run it. Running ingestion twice is the same as running it once. ([03](03-chunking-and-embeddings.md))
 
 **Index**: a side structure that lets the database find rows without reading every one, like a book's index. ([04](04-the-database.md))
@@ -118,8 +122,18 @@ the citation. ([00](00-overview.md))
 
 **Query parameter**: a filter written after the `?` in a web address (`?query.cond=obesity`). ([02](02-getting-the-data.md))
 
+**Query plan (`EXPLAIN`)**: the database's description of how it will run a query, for example whether it uses an index. We read it to check that the vector search really uses its index. ([05](05-retrieval.md))
+
 **RAG (Retrieval-Augmented Generation)**: first look up relevant documents, then have the AI answer
 using only those. ([00](00-overview.md))
+
+**Rank**: a position in a result list (1 = best). Merging by rank works where merging raw scores can't, because distances and text scores are on different scales. ([05](05-retrieval.md))
+
+**Reciprocal Rank Fusion (RRF)**: a way to merge ranked lists. An item at position `r` earns `1 / (60 + r)` from each list it appears in, and the points are added up. Items that several lists like come first. ([05](05-retrieval.md))
+
+**Regression test**: a test that guards a bug that was already found and fixed, so it can't come back unnoticed. ([05](05-retrieval.md))
+
+**Retrieval**: the "R" of RAG: finding the pieces of data most likely to contain the answer, before any text is generated. ([05](05-retrieval.md))
 
 **Retry with backoff**: trying a failed request again after waiting, with longer waits each time (2s, 4s, 8s), to give a busy server room to recover. ([02](02-getting-the-data.md))
 
@@ -133,9 +147,13 @@ using only those. ([00](00-overview.md))
 
 **Stemming**: reducing a word to its root so word forms match ("obesity" and "obese" both become `obes`). ([04](04-the-database.md))
 
+**Stop word**: a very common word ("which", "for", "the") that search ignores because it says nothing about the topic. ([05](05-retrieval.md))
+
 **Temperature**: how random a model's writing is. 0 means "always the most likely next word", so answers are repeatable; higher means more varied. ([07](07-providers.md))
 
 **Token**: a piece of a word, roughly 3 to 4 characters of English. Models read, write, are limited and are billed in tokens. ([07](07-providers.md))
+
+**Top-k**: how many results to keep: the best `k`. Our `TOP_K` setting is how many trials retrieval returns. ([05](05-retrieval.md))
 
 **Transaction**: a group of database changes that are saved together (commit) or not at all (rollback). It keeps a trial and its chunks from ever being half-written. ([03](03-chunking-and-embeddings.md))
 

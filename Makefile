@@ -1,5 +1,5 @@
 # Short names for the commands you'll run most. `make help` lists them.
-.PHONY: help setup lint format test fetch fetch-sample check-models db-up db-down db-init db-status db-psql db-reset ingest ingest-sample
+.PHONY: help setup lint format test fetch fetch-sample check-models db-up db-down db-init db-status db-psql db-reset ingest ingest-sample search
 
 help: ## Show this list
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -53,3 +53,6 @@ ingest: ## Chunk, embed and store all downloaded trials (several minutes the fir
 
 ingest-sample: ## Same, but only for the small sample download (about a minute)
 	uv run python -m ingestion.run --sample
+
+search: ## Search the trials: make search Q="your question" [ARGS="--phase PHASE3 --mode vector"]
+	uv run python -m app.rag.retrieve "$(Q)" $(ARGS)

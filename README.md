@@ -22,6 +22,7 @@ LlamaIndex, and every step comes with a plain-English guide.
 ```bash
 make setup   # install Python libraries, the git hook and a .env file
 make test    # run the tests
+make search Q="Which trials test semaglutide in Thailand?"   # search the ingested trials
 make help    # list all shortcuts
 ```
 
@@ -36,7 +37,7 @@ You also need Docker Desktop and Ollama; [docs/01-setup.md](docs/01-setup.md) wa
 | [02 Getting the data](docs/02-getting-the-data.md) | done |
 | [03 Chunking and embeddings](docs/03-chunking-and-embeddings.md) | done |
 | [04 The database](docs/04-the-database.md) | done |
-| 05 Retrieval | planned |
+| [05 Retrieval](docs/05-retrieval.md) | done |
 | 06 Generation and citations | planned |
 | [07 Providers](docs/07-providers.md) | done |
 | 08 Running locally | planned |
